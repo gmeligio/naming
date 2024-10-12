@@ -6,7 +6,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/gmeligio/naming/internal/aws"
+	"github.com/gmeligio/naming/aws"
 	"github.com/stretchr/testify/require"
 )
 

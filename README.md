@@ -10,9 +10,13 @@ Create easily infrastructure names using organization conventions and following 
 - [ ] LB balancer
 - [ ] CloudWatch log group
 
+## TODO
+
+- [ ] Use a name generator for the region to simplify the generation algorithm used. See <https://github.com/hashicorp/terraform-provider-aws/blob/main/internal/create/naming.go>
+
 ## Contributing
 
-See [Contributing](docs/contributing)
+See [Contributing](docs/contributing).
 
 ## Acknowledgements
 
