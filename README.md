@@ -2,7 +2,19 @@
 
 Create easily infrastructure names using organization conventions and following cloud provider recommendations.
 
-## References
+## Supported Conventions
+
+- [ ] Custom
+- [x] S3 bucket
+- [x] SSM parameter
+- [ ] LB balancer
+- [ ] CloudWatch log group
+
+## Contributing
+
+See [Contributing](docs/contributing)
+
+## Acknowledgements
 
 - <https://github.com/aws/aws-cdk/blob/main/packages/aws-cdk-lib/core/lib/names.ts>
 - <https://github.com/hashicorp/terraform-plugin-sdk/blob/main/helper/id/id.go>
