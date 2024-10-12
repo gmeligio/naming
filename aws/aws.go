@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	s3Limit  = 63
-	albLimit = 32
+	s3BucketLimit  = 63
+	lbBalancerLimit = 32
 )
 
 var ShortRegions = map[string]string{
