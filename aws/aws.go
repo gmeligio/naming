@@ -1,14 +1,22 @@
+// Package aws provides functionality for generating standardized AWS resource names
+// following naming conventions for different AWS services such as S3 buckets and SSM parameters.
+// It supports region-aware naming with options for short region codes, custom separators,
+// and various naming patterns to ensure consistency across AWS resources.
 package aws
 
 import (
+	"errors"
 	"fmt"
-	"slices"
-	"strings"
 )
 
 const (
-	s3BucketLimit  = 63
-	lbBalancerLimit = 32
+// s3BucketLimit   = 63
+// lbBalancerLimit = 32
+)
+
+var (
+	ErrEmptyRegion    = errors.New("found an empty region. Region must be non-empty")
+	ErrEmptyShortName = errors.New("received an empty shortName but that's not supported. shortName is required to be non-empty")
 )
 
 var ShortRegions = map[string]string{
@@ -47,114 +55,31 @@ var ShortRegions = map[string]string{
 	"us-west-2":      "usw2",
 }
 
-type NamingAws struct {
-	DefaultDelimiter string
-	SSMDelimiter     string
-	PrefixSegments   []string
-	SuffixLength     int
-	UseShortRegion   bool
+type ErrNonSupportedRegion struct {
+	Region string
+	Err    error
 }
 
-func NewNamingAws() *NamingAws {
-	return &NamingAws{
-		PrefixSegments:   []string{},
-		DefaultDelimiter: "-",
-		SSMDelimiter:     "/",
-		SuffixLength:     4,
-	}
+func (e ErrNonSupportedRegion) Unwrap() error {
+	return e.Err
 }
 
-func (n *NamingAws) Name(prefixSegments []string, shortName string, separator string) (string, error) {
-	if shortName == "" {
-		return "", fmt.Errorf("Passed an empty shortName but that's not supported. shortName is required to be non-empty.")
+func (e ErrNonSupportedRegion) Is(target error) bool {
+	t, ok := target.(*ErrNonSupportedRegion)
+	if !ok {
+		return false
 	}
 
-	var segments []string
-	segments = append(segments, prefixSegments...)
-	segments = append(segments, shortName)
-
-	return strings.Join(segments, separator), nil
+	return errors.Is(e.Err, t.Err)
 }
 
-func (n *NamingAws) Default(shortName string) (string, error) {
-	name, err := n.Name(n.PrefixSegments, shortName, n.DefaultDelimiter)
-
-	if err != nil {
-		return "", err
-	}
-
-	return name, nil
+func (e ErrNonSupportedRegion) Error() string {
+	return fmt.Sprintf("region %q is not supported. Please create a new issue if it's a region that is supported by AWS", e.Region)
 }
 
-func (n *NamingAws) S3Bucket(shortName string) (string, error) {
-	fmt.Println("It's highly recommended to use WithRegionS3() instead of S3() because the bucket name must be unique globally and, at the same time, they are located in a specific region. Hence, it makes sense to include the region in the name.")
-
-	name, err := n.Name(n.PrefixSegments, shortName, n.SSMDelimiter)
-
-	if err != nil {
-		return "", err
+func NewErrNonSupportedRegion(region string, err error) *ErrNonSupportedRegion {
+	return &ErrNonSupportedRegion{
+		Region: region,
+		Err:    err,
 	}
-
-	return name, nil
-}
-
-func (n *NamingAws) SSMParameter(shortName string) (string, error) {
-	name, err := n.Name(n.PrefixSegments, shortName, n.SSMDelimiter)
-
-	if err != nil {
-		return "", err
-	}
-
-	return name, nil
-}
-
-func (n *NamingAws) WithRegionName(shortName string, separator string, region string) (string, error) {
-	regionSegment := region
-	if n.UseShortRegion {
-		if foundRegion, ok := ShortRegions[region]; ok {
-			regionSegment = foundRegion
-		} else {
-			return "", fmt.Errorf("Region %s is not supported. Please create a new issue if it's a region that is supported by AWS.", region)
-		}
-	}
-
-	segments := slices.Insert(n.PrefixSegments, 0, regionSegment)
-
-	name, err := n.Name(segments, shortName, separator)
-
-	if err != nil {
-		return "", err
-	}
-
-	return name, nil
-}
-
-func (n *NamingAws) WithRegionDefault(shortName string, region string) (string, error) {
-	name, err := n.WithRegionName(shortName, n.DefaultDelimiter, region)
-
-	if err != nil {
-		return "", err
-	}
-
-	return name, nil
-}
-
-func (n *NamingAws) WithRegionSSMParameter(shortName string, region string) (string, error) {
-	name, err := n.WithRegionName(shortName, n.SSMDelimiter, region)
-
-	if err != nil {
-		return "", err
-	}
-
-	return name, nil
-}
-
-func (n *NamingAws) WithRegionS3Bucket(shortName string, region string) (string, error) {
-	name, err := n.WithRegionName(shortName, n.DefaultDelimiter, region)
-
-	if err != nil {
-		return "", err
-	}
-
-	return name, nil
 }
