@@ -4,15 +4,15 @@ package aws
 type AWSNamer struct {
 	// Encoder is the AWSEncoder used to generate names.
 	Encoder *AWSEncoder
-	// Options holds the options for generating AWS names.
-	Options *AWSEncoderOptions
+	// EncoderOptions holds the options for generating AWS names.
+	EncoderOptions *AWSEncoderOptions
 }
 
 // NewAWSNamer creates a new AWSNamer with default values.
 func NewAWSNamer() *AWSNamer {
 	return &AWSNamer{
-		Encoder: NewAWSEncoder(),
-		Options: &AWSEncoderOptions{},
+		Encoder:        NewAWSEncoder(),
+		EncoderOptions: &AWSEncoderOptions{},
 	}
 }
 
@@ -24,7 +24,7 @@ func (n *AWSNamer) WithEncoder(encoder *AWSEncoder) *AWSNamer {
 
 // WithPrefixSegments sets the prefix segments for the AWSNamer.
 func (n *AWSNamer) WithPrefixSegments(prefixSegments []string) *AWSNamer {
-	n.Options.PrefixSegments = prefixSegments
+	n.EncoderOptions.PrefixSegments = prefixSegments
 	return n
 }
 
@@ -34,7 +34,7 @@ func (n *AWSNamer) WithRegion(region string) (*AWSNamer, error) {
 		return nil, ErrEmptyRegion
 	}
 
-	n.Options.Region = &region
+	n.EncoderOptions.Region = &region
 
 	return n, nil
 }
@@ -45,24 +45,24 @@ func (n *AWSNamer) WithShortName(shortName string) (*AWSNamer, error) {
 		return nil, ErrEmptyShortName
 	}
 
-	n.Options.ShortName = &shortName
+	n.EncoderOptions.ShortName = &shortName
 	return n, nil
 }
 
 // WithSeparator sets the separator for the AWSNamer.
 func (n *AWSNamer) WithSeparator(separator string) *AWSNamer {
-	n.Options.Separator = &separator
+	n.EncoderOptions.Separator = &separator
 
 	return n
 }
 
 // WithStartsWithSeparator sets whether the name should start with the separator.
 func (n *AWSNamer) WithStartsWithSeparator(startsWithSeparator bool) *AWSNamer {
-	n.Options.StartsWithSeparator = startsWithSeparator
+	n.EncoderOptions.StartsWithSeparator = startsWithSeparator
 	return n
 }
 
 // Name generates the AWS name based on the provided options.
 func (n *AWSNamer) Name() (string, error) {
-	return n.Encoder.Encode(n.Options)
+	return n.Encoder.Encode(n.EncoderOptions)
 }

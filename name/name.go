@@ -3,7 +3,7 @@
 package name
 
 type Namer interface {
-	Name(prefixSegments []string, shortName string, separator string, startsWithSeparator bool) (string, error)
+	Name() (string, error)
 }
 
 type Encoder interface {
