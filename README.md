@@ -1,3 +1,5 @@
+[![Go Reference](https://pkg.go.dev/badge/github.com/gmeligio/naming.svg)](https://pkg.go.dev/github.com/gmeligio/naming)
+
 # naming
 
 Create easily infrastructure names using organization conventions and following cloud provider recommendations.
